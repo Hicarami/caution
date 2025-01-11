@@ -51,18 +51,18 @@ async def on_ready() -> None:
         await bot.tree.sync()  # Sync commands globally
         print("Commands synced globally.")
 
-# Sync command (manual sync to sync commands globally)
+# Renamed sync command (manual sync to sync commands globally)
 @bot.command()
 @commands.is_owner()  # Only the bot owner can use this
-async def sync(ctx):
+async def force_sync(ctx):
     print("Syncing commands globally...")
     await bot.tree.sync()  # Sync all commands globally
     await ctx.send("Commands synced globally.")
 
 # Status task loop
-@tasks.loop(minutes=1.0)
+@tasks.loop(minutes=2.5)
 async def status_task() -> None:
-    statss = ["Version | 0.0.1", "Created by Hicarami", "/help"]
+    statss = ["Version | 0.0.1", "Created by Hicarami", "- or /help"]
     await bot.change_presence(activity=discord.CustomActivity(random.choice(statss)))
 
 @bot.command()
