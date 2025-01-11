@@ -34,8 +34,13 @@ class MISC(commands.Cog, name="misc"):
         # Calculate response time
         duration = (end - start) * 1000
         
-        # bot.latency gives the WebSocket latency
-        await message.edit(content=f"**Web socket latency:** {round(self.bot.latency * 1000)}ms\n**Total latency:** {duration:.0f}ms")
+        # Create an embed for the response
+        embed = discord.Embed(title="Ping Response", color=discord.Color.green())
+        embed.add_field(name="Web Socket Latency", value=f"{round(self.bot.latency * 1000)}ms", inline=False)
+        embed.add_field(name="Total Latency", value=f"{duration:.0f}ms", inline=False)
+        
+        # Edit the message to include the embed
+        await message.edit(content=None, embed=embed)
         
         
 
