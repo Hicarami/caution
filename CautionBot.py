@@ -30,6 +30,8 @@ discord_token = os.getenv("token")
 if not discord_token:
     sys.exit("Discord token is not set! Please set the DISCORD_TOKEN environment variable.")
 
+prefix = config["prefix"] if "prefix" in config else "-"
+
 # Command sync logic (Auto-sync commands globally)
 @bot.event
 async def on_ready() -> None:
