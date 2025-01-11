@@ -99,29 +99,55 @@ async def sync(ctx: Context, guilds: Greedy[discord.Object], spec: Optional[Lite
 
     await ctx.send(f"Synced the tree to {ret}/{len(guilds)}.")
 
-# Error handling
 @bot.event
 async def on_command_error(ctx, error):
     embedNotFound = discord.Embed(
-        description=f"**Invalid Command. Try using** `-help` ** to figure out commands!**",
+        description="**Invalid Command. Try using** `-help` ** to figure out commands!**",
         color=discord.Color.red()
     )
     embedReqArg = discord.Embed(
-        description=f"**Pass all the requirements.**",
+        description="**Pass all the requirements.**",
         color=discord.Color.red()
     )
     embedMissingPerm = discord.Embed(
-        description=f"**You don't have all the permissions for using this command!**",
+        description="**You don't have all the permissions for using this command!**",
         color=discord.Color.red()
     )
+    
     if isinstance(error, commands.CommandNotFound):
         await ctx.send(embed=embedNotFound, delete_after=30)
         
-    if isinstance(error, commands.MissingRequiredArgument):
+    elif isinstance(error, commands.MissingRequiredArgument):
         await ctx.send(embed=embedReqArg, delete_after=30)
         
-    if isinstance(error, commands.MissingPermissions):
+    elif isinstance(error, commands.MissingPermissions):
         await ctx.send(embed=embedMissingPerm, delete_after=30)
+        
+    # Add additional checks for other specific error types:
+    elif isinstance(error, commands.CheckFailure):
+        # If the user doesn't pass a check for a command (like permissions or role-based checks)
+        embed = discord.Embed(
+            description="**You do not have the necessary permissions to run this command.**",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed, delete_after=30)
+        
+    elif isinstance(error, commands.CommandInvokeError):
+        # This is a catch-all for errors raised during command execution
+        embed = discord.Embed(
+            description="**An error occurred while executing the command.** Please try again later.",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed, delete_after=30)
+        
+    else:
+        # This will catch all other unhandled errors and log them
+        embed = discord.Embed(
+            description="**An unexpected error occurred.** Please contact the bot owner.",
+            color=discord.Color.red()
+        )
+        await ctx.send(embed=embed, delete_after=30)
+        raise error  # Raise the error again to log it for debugging (optional)
 
 # Load cogs
 async def load_cogs() -> None:
