@@ -13,8 +13,6 @@ from discord.ext.commands import Bot, Context, Greedy
 
 # Initialize bot and config
 intents = discord.Intents.default()
-bot = commands.Bot(command_prefix='-', intents=intents, help_command=None)
-
 
 # Load config.json or use environment variables
 config = {}
@@ -22,7 +20,6 @@ if os.path.exists("config.json"):
     with open("config.json", "r") as file:
         config = json.load(file)
 else:
-    config["prefix"] = os.getenv("prefix", "-")
     config["sync_commands_globally"] = True  # Default to syncing commands globally if no config.json
 
 discord_token = os.getenv("token")
@@ -30,7 +27,8 @@ discord_token = os.getenv("token")
 if not discord_token:
     sys.exit("Discord token is not set! Please set the DISCORD_TOKEN environment variable.")
 
-prefix = config["prefix"] if "prefix" in config else "-"
+# Initialize the bot with slash commands (remove prefix)
+bot = commands.Bot(command_prefix="!", intents=intents, help_command=None, application_id=int(os.getenv("DISCORD_APP_ID", 0)))
 
 # Command sync logic (Auto-sync commands globally)
 @bot.event
@@ -47,16 +45,24 @@ async def on_ready() -> None:
     status_task.start()
     print("Caution by Hicarami")
 
-    # Syncing the commands globally
-    if config.get("sync_commands_globally", True):  # This can be controlled via config.json or environment variable
+    # Syncing the commands globally (if needed)
+    if config.get("sync_commands_globally", True):
         print("Syncing commands globally...")
         await bot.tree.sync()  # Sync commands globally
         print("Commands synced globally.")
 
+# Sync command (manual sync to sync commands globally)
+@bot.command()
+@commands.is_owner()  # Only the bot owner can use this
+async def sync(ctx):
+    print("Syncing commands globally...")
+    await bot.tree.sync()  # Sync all commands globally
+    await ctx.send("Commands synced globally.")
+
 # Status task loop
-@tasks.loop(minutes=2.5)
+@tasks.loop(minutes=1.0)
 async def status_task() -> None:
-    statss = ["Version | 0.0.1", "Created by Hicarami", "-help or /help"]
+    statss = ["Version | 0.0.1", "Created by Hicarami", "/help"]
     await bot.change_presence(activity=discord.CustomActivity(random.choice(statss)))
 
 @bot.command()
