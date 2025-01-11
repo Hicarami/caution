@@ -40,8 +40,8 @@ async def on_ready() -> None:
 
 @tasks.loop(minutes=2.5)
 async def status_task() -> None:
-    statss = ["with commands!", "with Hicarami", "- or /help"]
-    await bot.change_presence(activity=discord.Game(random.choice(statss)))
+    statss = ["Version | 0.0.1", "Created by Hicarami", "- or /help"]
+    await bot.change_presence(activity=discord.CustomActivity(random.choice(statss)))
 
 @bot.command()
 @commands.has_permissions(manage_roles=True)
