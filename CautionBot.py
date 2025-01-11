@@ -16,12 +16,19 @@ from typing import Literal, Optional
 from enum import member
 
 
-        
-if not os.path.isfile("config.json"):
-    sys.exit("'config.json' not found! Please add it and try again.")
-else:
-    with open("config.json") as file:
+       
+
+# Check if config.json exists, otherwise use environment variables
+if os.path.exists("config.json"):
+    with open("config.json", "r") as file:
         config = json.load(file)
+        discord_token = config.get("token")
+else:
+    discord_token = os.getenv("token")
+
+if not discord_token:
+    sys.exit("Configuration is missing! Please set config.json or environment variables.")
+
         
 
 
