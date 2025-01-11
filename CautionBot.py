@@ -18,16 +18,21 @@ from enum import member
 
        
 
-# Check if config.json exists, otherwise use environment variables
+# Check if the config.json file exists
 if os.path.exists("config.json"):
     with open("config.json", "r") as file:
         config = json.load(file)
-        discord_token = config.get("token")
+        prefix = config.get("prefix", "-")  # Default to "!" if no prefix is found
 else:
-    discord_token = os.getenv("token")
+    prefix = os.getenv("prefix", "-")  # Use environment variable if config.json is missing
+
+discord_token = os.getenv("token")
 
 if not discord_token:
-    sys.exit("Configuration is missing! Please set config.json or environment variables.")
+    sys.exit("Discord token is not set! Please set the DISCORD_TOKEN environment variable.")
+
+intents = discord.Intents.default()
+bot = commands.Bot(command_prefix=prefix, intents=intents, help_command=None)
 
         
 
@@ -177,4 +182,4 @@ async def load_cogs() -> None:
 
 
 asyncio.run(load_cogs())
-bot.run(config["token"])
+bot.run(token)
